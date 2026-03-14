@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.TransactionRequestDTO;
 import com.example.demo.model.Transaction;
 import com.example.demo.repository.TransactionRepository;
 
@@ -22,43 +23,42 @@ public class TransactionController {
 
     private final TransactionRepository repository;
 
-    // Injeção de dependência via construtor
     public TransactionController(TransactionRepository repository) {
         this.repository = repository;
     }
 
-    // Endpoint para LISTAR todas as transações (GET)
     @GetMapping
     public List<Transaction> getAllTransactions() {
         return repository.findAll();
     }
 
-    // Endpoint para SALVAR uma nova transação (POST)
     @PostMapping
-    public Transaction createTransaction(@Valid @RequestBody Transaction transaction) {
+    public Transaction createTransaction(@Valid @RequestBody TransactionRequestDTO dto) {
+        // Pega os dados do DTO (Recepcionista) e cria a Entidade (Banco de Dados)
+        Transaction transaction = new Transaction();
+        transaction.setDescription(dto.description());
+        transaction.setAmount(dto.amount());
+        transaction.setTransactionDate(dto.transactionDate());
+
         return repository.save(transaction);
     }
 
-    // Endpoint para DELETAR uma transação pelo ID (DELETE)
     @DeleteMapping("/{id}")
     public void deleteTransaction(@PathVariable Long id) {
         repository.deleteById(id);
     }
-    
-    // Endpoint para ATUALIZAR uma transação existente (PUT)
+
     @PutMapping("/{id}")
-    public Transaction updateTransaction(@PathVariable Long id, @Valid @RequestBody Transaction transactionDetails) {
+    public Transaction updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionRequestDTO dto) {
         
-        // 1. Busca a transação antiga no banco de dados
         Transaction existingTransaction = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada com o ID: " + id));
 
-        // 2. Atualiza os dados com as informações novas
-        existingTransaction.setDescription(transactionDetails.getDescription());
-        existingTransaction.setAmount(transactionDetails.getAmount());
-        existingTransaction.setTransactionDate(transactionDetails.getTransactionDate());
+        // Atualiza a entidade existente com os dados limpos do DTO
+        existingTransaction.setDescription(dto.description());
+        existingTransaction.setAmount(dto.amount());
+        existingTransaction.setTransactionDate(dto.transactionDate());
 
-        // 3. Salva de volta no MySQL e retorna o resultado
         return repository.save(existingTransaction);
     }
 }

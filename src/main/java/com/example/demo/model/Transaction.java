@@ -8,8 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "transactions")
@@ -19,20 +17,13 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "A descrição é obrigatória e não pode estar em branco")
     private String description;
-
-    @NotNull(message = "O valor da transação é obrigatório")
     private BigDecimal amount;
-
-    @NotNull(message = "A data da transação é obrigatória")
     private LocalDate transactionDate;
 
-    // Construtor vazio exigido pelo Spring (JPA)
     public Transaction() {
     }
-    
-    // Getters e Setters (Permitem acessar e modificar os dados)
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
