@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.TransactionRequestDTO;
 import com.example.demo.model.Transaction;
-import com.example.demo.repository.TransactionRepository;
+import com.example.demo.service.TransactionService;
 
 import jakarta.validation.Valid;
 
@@ -21,44 +21,32 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/transactions")
 public class TransactionController {
 
-    private final TransactionRepository repository;
+    // Agora o Controlador fala apenas com o Service, e não mais com o Repository
+    private final TransactionService service;
 
-    public TransactionController(TransactionRepository repository) {
-        this.repository = repository;
+    public TransactionController(TransactionService service) {
+        this.service = service;
     }
 
     @GetMapping
     public List<Transaction> getAllTransactions() {
-        return repository.findAll();
+        // O controlador apenas repassa o pedido
+        return service.getAllTransactions();
     }
 
     @PostMapping
     public Transaction createTransaction(@Valid @RequestBody TransactionRequestDTO dto) {
-        // Pega os dados do DTO (Recepcionista) e cria a Entidade (Banco de Dados)
-        Transaction transaction = new Transaction();
-        transaction.setDescription(dto.description());
-        transaction.setAmount(dto.amount());
-        transaction.setTransactionDate(dto.transactionDate());
-
-        return repository.save(transaction);
+        // Toda aquela lógica gigante de criar transação sumiu daqui!
+        return service.createTransaction(dto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteTransaction(@PathVariable Long id) {
-        repository.deleteById(id);
+        service.deleteTransaction(id);
     }
 
     @PutMapping("/{id}")
     public Transaction updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionRequestDTO dto) {
-        
-        Transaction existingTransaction = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada com o ID: " + id));
-
-        // Atualiza a entidade existente com os dados limpos do DTO
-        existingTransaction.setDescription(dto.description());
-        existingTransaction.setAmount(dto.amount());
-        existingTransaction.setTransactionDate(dto.transactionDate());
-
-        return repository.save(existingTransaction);
+        return service.updateTransaction(id, dto);
     }
 }

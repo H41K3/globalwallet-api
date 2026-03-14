@@ -10,23 +10,24 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.demo.repository.TransactionRepository;
+import com.example.demo.service.TransactionService;
 
+// Usando a SUA anotação que comprovadamente funciona na sua máquina!
 @org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest(TransactionController.class)
 public class TransactionControllerTest {
 
     @Autowired
-    private MockMvc mockMvc; // O robô que simula o navegador/Swagger
+    private MockMvc mockMvc;
 
     @MockitoBean
-    private TransactionRepository repository; // Um banco de dados "de mentira" para o teste
+    private TransactionService service; // O Chef de mentira
 
     @Test
     public void shouldReturnOkWhenGettingAllTransactions() throws Exception {
-        // 1. Prepara o cenário: Ensina o banco de mentira a retornar uma lista vazia
-        Mockito.when(repository.findAll()).thenReturn(Collections.emptyList());
+        // Ensina o Chef de mentira a retornar uma lista vazia quando perguntarem
+        Mockito.when(service.getAllTransactions()).thenReturn(Collections.emptyList());
 
-        // 2. Executa a ação e verifica o resultado: Chama a API e garante que ela responde 200 OK
+        // Chama a API e garante que o Garçom atende bem e responde 200 OK
         mockMvc.perform(get("/api/v1/transactions"))
                 .andExpect(status().isOk());
     }
