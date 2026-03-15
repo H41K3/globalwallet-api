@@ -1,17 +1,16 @@
-# 1. Pega um computador virtual "limpo" apenas com o Java 25 instalado
-FROM eclipse-temurin:25-jdk
-
-# 2. Assinatura de quem construiu a imagem (ótimo para portfólio)
-LABEL maintainer="Haike"
-
-# 3. Cria uma pasta de trabalho lá dentro
+# Estágio 1: Build (O Cozinheiro)
+# Usa uma imagem do Maven para compilar o código
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
+COPY . .
+# Executa o comando para gerar o .jar, pulando os testes para ser mais rápido
+RUN mvn clean package -DskipTests
 
-# 4. Pega o seu "bolo assado" (o .jar) e coloca dentro da caixa com o nome "app.jar"
-COPY target/demo-0.0.1-SNAPSHOT.jar app.jar
-
-# 5. Avisa que o sistema se comunica pela porta 8080
+# Estágio 2: Run (O Garçom)
+# Usa uma imagem leve do Java para rodar a aplicação
+FROM eclipse-temurin:25-jdk
+WORKDIR /app
+# Copia o "bolo assado" do Estágio 1 para este estágio final
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# 6. O comando que o container vai rodar automaticamente quando for ligado
 ENTRYPOINT ["java", "-jar", "app.jar"]
