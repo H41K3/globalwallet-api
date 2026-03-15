@@ -9,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,9 +25,14 @@ public class Transaction {
     private BigDecimal amount;
     private LocalDate transactionDate;
 
-    // NOVO CAMPO: Diz ao banco de dados para salvar como texto (INCOME ou EXPENSE)
+    // Diz ao banco de dados para salvar como texto (INCOME ou EXPENSE)
     @Enumerated(EnumType.STRING)
     private TransactionType type;
+
+    // Relacionamento com o usuário dono da transação
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Transaction() {
     }
@@ -45,4 +52,7 @@ public class Transaction {
 
     public TransactionType getType() { return type; }
     public void setType(TransactionType type) { this.type = type; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

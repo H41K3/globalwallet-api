@@ -4,6 +4,7 @@ public enum UserRole {
     ADMIN("admin"),
     USER("user");
 
+    @SuppressWarnings("FieldMayBeFinal")
     private String role;
 
     UserRole(String role) {

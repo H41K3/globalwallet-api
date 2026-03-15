@@ -9,6 +9,7 @@ import com.example.demo.dto.BalanceResponseDTO;
 import com.example.demo.dto.TransactionRequestDTO;
 import com.example.demo.model.Transaction;
 import com.example.demo.model.TransactionType;
+import com.example.demo.model.User;
 import com.example.demo.repository.TransactionRepository;
 
 @Service
@@ -20,37 +21,45 @@ public class TransactionService {
         this.repository = repository;
     }
 
-    public List<Transaction> getAllTransactions() {
-        return repository.findAll();
+    public List<Transaction> getAllTransactions(User user) {
+        // Agora busca apenas as transações do usuário logado
+        return repository.findAllByUser(user);
     }
 
-    // Método para buscar por ID e disparar o erro caso não exista
-    public Transaction getTransactionById(Long id) {
-        return repository.findById(id)
+    public Transaction getTransactionById(Long id, User user) {
+        Transaction transaction = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada com o ID: " + id));
+        
+        // Barreira de Segurança: Impede que um usuário acesse transações de outro
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Acesso Negado: Esta transação não pertence a você.");
+        }
+        
+        return transaction;
     }
 
-    public Transaction createTransaction(TransactionRequestDTO dto) {
+    public Transaction createTransaction(TransactionRequestDTO dto, User user) {
         Transaction transaction = new Transaction();
         transaction.setDescription(dto.description());
         transaction.setAmount(dto.amount());
         transaction.setTransactionDate(dto.transactionDate());
         transaction.setType(dto.type()); 
+        
+        // Vincula o usuário logado como dono da transação
+        transaction.setUser(user);
 
         return repository.save(transaction);
     }
 
-    public void deleteTransaction(Long id) {
-        // Verifica se existe antes de deletar para disparar o erro caso não exista
-        if (!repository.existsById(id)) {
-            throw new RuntimeException("Não é possível deletar. Transação não encontrada com o ID: " + id);
-        }
-        repository.deleteById(id);
+    public void deleteTransaction(Long id, User user) {
+        // Reutiliza a nossa barreira de segurança para garantir que ele é o dono
+        Transaction transaction = getTransactionById(id, user);
+        repository.delete(transaction);
     }
 
-    public Transaction updateTransaction(Long id, TransactionRequestDTO dto) {
-        Transaction existingTransaction = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada com o ID: " + id));
+    public Transaction updateTransaction(Long id, TransactionRequestDTO dto, User user) {
+        // Reutiliza a barreira de segurança
+        Transaction existingTransaction = getTransactionById(id, user);
 
         existingTransaction.setDescription(dto.description());
         existingTransaction.setAmount(dto.amount());
@@ -60,8 +69,9 @@ public class TransactionService {
         return repository.save(existingTransaction);
     }
 
-    public BalanceResponseDTO getBalanceSummary() {
-        List<Transaction> transactions = repository.findAll();
+    public BalanceResponseDTO getBalanceSummary(User user) {
+        // Calcula o balanço apenas com as transações do usuário logado
+        List<Transaction> transactions = repository.findAllByUser(user);
         
         BigDecimal totalIncome = BigDecimal.ZERO;
         BigDecimal totalExpense = BigDecimal.ZERO;
