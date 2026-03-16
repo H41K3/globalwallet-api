@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.BalanceResponseDTO;
 import com.example.demo.dto.TransactionRequestDTO;
 import com.example.demo.model.Transaction;
-import com.example.demo.model.TransactionType;
 import com.example.demo.model.User;
 import com.example.demo.repository.TransactionRepository;
 
@@ -29,12 +27,12 @@ public class TransactionService {
     public Transaction getTransactionById(Long id, User user) {
         Transaction transaction = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada com o ID: " + id));
-        
+
         // Barreira de Segurança: Impede que um usuário acesse transações de outro
         if (!transaction.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Acesso Negado: Esta transação não pertence a você.");
         }
-        
+
         return transaction;
     }
 
@@ -43,8 +41,8 @@ public class TransactionService {
         transaction.setDescription(dto.description());
         transaction.setAmount(dto.amount());
         transaction.setTransactionDate(dto.transactionDate());
-        transaction.setType(dto.type()); 
-        
+        transaction.setType(dto.type());
+
         // Vincula o usuário logado como dono da transação
         transaction.setUser(user);
 
@@ -64,27 +62,29 @@ public class TransactionService {
         existingTransaction.setDescription(dto.description());
         existingTransaction.setAmount(dto.amount());
         existingTransaction.setTransactionDate(dto.transactionDate());
-        existingTransaction.setType(dto.type()); 
+        existingTransaction.setType(dto.type());
 
         return repository.save(existingTransaction);
     }
 
+    // ... outros métodos (getAll, create, delete, etc) ...
     public BalanceResponseDTO getBalanceSummary(User user) {
-        // Calcula o balanço apenas com as transações do usuário logado
         List<Transaction> transactions = repository.findAllByUser(user);
-        
-        BigDecimal totalIncome = BigDecimal.ZERO;
-        BigDecimal totalExpense = BigDecimal.ZERO;
 
-        for (Transaction t : transactions) {
-            if (t.getType() == TransactionType.INCOME) {
-                totalIncome = totalIncome.add(t.getAmount());
-            } else if (t.getType() == TransactionType.EXPENSE) {
-                totalExpense = totalExpense.add(t.getAmount());
-            }
-        }
+        // Soma Entradas
+        java.math.BigDecimal totalIncome = transactions.stream()
+                .filter(t -> t.getType() == com.example.demo.model.TransactionType.INCOME)
+                .map(Transaction::getAmount)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
-        BigDecimal balance = totalIncome.subtract(totalExpense);
+        // Soma Despesas
+        java.math.BigDecimal totalExpense = transactions.stream()
+                .filter(t -> t.getType() == com.example.demo.model.TransactionType.EXPENSE)
+                .map(Transaction::getAmount)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+        // Calcula Saldo Líquido
+        java.math.BigDecimal balance = totalIncome.subtract(totalExpense);
 
         return new BalanceResponseDTO(totalIncome, totalExpense, balance);
     }

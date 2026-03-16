@@ -58,8 +58,9 @@ public class TransactionController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/summary")
-    public ResponseEntity<BalanceResponseDTO> getSummary(@AuthenticationPrincipal User user) {
+    @GetMapping("/balance")
+    public ResponseEntity<BalanceResponseDTO> getBalance(@AuthenticationPrincipal User user) {
+        // Chamada única e limpa para o resumo financeiro
         return ResponseEntity.ok(service.getBalanceSummary(user));
     }
 }
