@@ -13,7 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.demo.infra.security.TokenService; // Adicione este
 import com.example.demo.model.User;
+import com.example.demo.service.AuthorizationService; // Adicione este
 import com.example.demo.service.TransactionService;
 
 @WebMvcTest(TransactionController.class)
@@ -25,10 +27,15 @@ public class TransactionControllerTest {
     @MockitoBean
     private TransactionService service;
 
+    @MockitoBean
+    private TokenService tokenService;
+
+    @MockitoBean
+    private AuthorizationService authorizationService;
+
     @Test
     @WithMockUser
     public void shouldReturnOkWhenGettingAllTransactions() throws Exception {
-        // Ensinamos o Mockito a esperar o User que o seu Controller agora exige
         Mockito.when(service.getAllTransactions(ArgumentMatchers.any(User.class)))
                .thenReturn(Collections.emptyList());
 
