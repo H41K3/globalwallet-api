@@ -29,6 +29,10 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
+    // --- AQUI ESTÁ A CORREÇÃO: A Categoria agora faz parte da Transação ---
+    @Enumerated(EnumType.STRING)
+    private TransactionCategory category;
+
     // Relacionamento com o usuário dono da transação
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -52,6 +56,10 @@ public class Transaction {
 
     public TransactionType getType() { return type; }
     public void setType(TransactionType type) { this.type = type; }
+
+    // --- AQUI ESTÁ A CORREÇÃO: Métodos para pegar e alterar a Categoria ---
+    public TransactionCategory getCategory() { return category; }
+    public void setCategory(TransactionCategory category) { this.category = category; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

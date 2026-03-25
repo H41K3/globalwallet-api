@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.example.demo.model.TransactionType;
+import com.example.demo.model.TransactionCategory;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,5 +22,8 @@ public record TransactionRequestDTO(
     LocalDate transactionDate,
 
     @NotNull(message = "O tipo (INCOME/EXPENSE) é obrigatório")
-    TransactionType type
+    TransactionType type,
+
+    @NotNull(message = "A categoria é obrigatória")
+    TransactionCategory category
 ) {}

@@ -28,11 +28,9 @@ public class TransactionService {
     }
 
     public Transaction getTransactionById(Long id, User user) {
-        // Passo 1: Busca no banco. Se não existir, lança 404 via Handler
         Transaction transaction = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Transação não encontrada com o ID: " + id));
 
-        // Passo 2: Barreira de Segurança (Isolamento de Dados)
         if (!transaction.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Acesso Negado: Esta transação não pertence a você.");
         }
@@ -46,6 +44,10 @@ public class TransactionService {
         transaction.setAmount(dto.amount());
         transaction.setTransactionDate(dto.transactionDate());
         transaction.setType(dto.type());
+        
+        // --- Adicionando a Categoria ---
+        transaction.setCategory(dto.category()); 
+        
         transaction.setUser(user);
 
         return repository.save(transaction);
@@ -63,6 +65,9 @@ public class TransactionService {
         existingTransaction.setAmount(dto.amount());
         existingTransaction.setTransactionDate(dto.transactionDate());
         existingTransaction.setType(dto.type());
+        
+        // --- Atualizando a Categoria ---
+        existingTransaction.setCategory(dto.category());
 
         return repository.save(existingTransaction);
     }
@@ -70,19 +75,16 @@ public class TransactionService {
     public BalanceResponseDTO getBalanceSummary(User user) {
         List<Transaction> transactions = repository.findAllByUser(user);
 
-        // Soma Entradas (INCOME)
         BigDecimal totalIncome = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.INCOME)
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Soma Despesas (EXPENSE)
         BigDecimal totalExpense = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Calcula Saldo Líquido
         BigDecimal balance = totalIncome.subtract(totalExpense);
 
         return new BalanceResponseDTO(totalIncome, totalExpense, balance);
