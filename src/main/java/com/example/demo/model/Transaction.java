@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,18 +26,20 @@ public class Transaction {
     private BigDecimal amount;
     private LocalDate transactionDate;
 
-    // Diz ao banco de dados para salvar como texto (INCOME ou EXPENSE)
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
-    // --- AQUI ESTÁ A CORREÇÃO: A Categoria agora faz parte da Transação ---
     @Enumerated(EnumType.STRING)
     private TransactionCategory category;
 
-    // Relacionamento com o usuário dono da transação
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    // --- NOVO: Relacionamento opcional com Cartão ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "card_id")
+    private Card card;
 
     public Transaction() {
     }
@@ -57,10 +60,13 @@ public class Transaction {
     public TransactionType getType() { return type; }
     public void setType(TransactionType type) { this.type = type; }
 
-    // --- AQUI ESTÁ A CORREÇÃO: Métodos para pegar e alterar a Categoria ---
     public TransactionCategory getCategory() { return category; }
     public void setCategory(TransactionCategory category) { this.category = category; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
+    // --- NOVO: Getters e Setters do Cartão ---
+    public Card getCard() { return card; }
+    public void setCard(Card card) { this.card = card; }
 }

@@ -3,8 +3,8 @@ package com.example.demo.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.example.demo.model.TransactionType;
 import com.example.demo.model.TransactionCategory;
+import com.example.demo.model.TransactionType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,5 +25,8 @@ public record TransactionRequestDTO(
     TransactionType type,
 
     @NotNull(message = "A categoria é obrigatória")
-    TransactionCategory category
+    TransactionCategory category,
+
+    // --- NOVO: ID do cartão opcional ---
+    Long cardId
 ) {}
