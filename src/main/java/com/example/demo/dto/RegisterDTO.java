@@ -1,4 +1,18 @@
 package com.example.demo.dto;
 
-// Front-end envia apenas as credenciais
-public record RegisterDTO(String login, String password) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record RegisterDTO(
+        @NotBlank
+        String fullName,
+        @NotBlank
+        String cpf,
+        @NotBlank
+        String email,
+        @NotBlank
+        String phone,
+        @NotBlank
+        String password
+        ) {
+
+}

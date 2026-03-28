@@ -3,18 +3,20 @@ package com.example.demo.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder; // IMPORT NOVO
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping; // IMPORT NOVO
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AuthenticationDTO;
-import com.example.demo.dto.ChangePasswordDTO; // IMPORT NOVO
+import com.example.demo.dto.ChangePasswordDTO;
 import com.example.demo.dto.LoginResponseDTO;
 import com.example.demo.dto.RegisterDTO;
+import com.example.demo.dto.UserProfileDTO;
 import com.example.demo.infra.security.TokenService;
 import com.example.demo.model.User;
 import com.example.demo.model.UserRole;
@@ -38,7 +40,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+        // Agora usamos data.cpf() em vez de login
+        var usernamePassword = new UsernamePasswordAuthenticationToken(data.cpf(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
         var token = tokenService.generateToken((User) auth.getPrincipal());
@@ -48,41 +51,57 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data) {
-        if (this.repository.findByLogin(data.login()) != null) return ResponseEntity.badRequest().build();
+        // Verifica se o CPF (salvo no login) já existe
+        if (this.repository.findByLogin(data.cpf()) != null) {
+            return ResponseEntity.badRequest().build();
+        }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        
-        User newUser = new User(null, data.login(), encryptedPassword, UserRole.USER);
+
+        // Como o construtor antigo não tinha os campos novos, usamos o construtor vazio e os setters
+        User newUser = new User();
+        newUser.setLogin(data.cpf()); // Salvamos o CPF na coluna login!
+        newUser.setPassword(encryptedPassword);
+        newUser.setRole(UserRole.USER);
+        newUser.setFullName(data.fullName());
+        newUser.setEmail(data.email());
+        newUser.setPhone(data.phone());
 
         this.repository.save(newUser);
 
         return ResponseEntity.ok().build();
     }
 
-    // ==========================================
-    // ROTA NOVA: TROCA DE SENHA
-    // ==========================================
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordDTO data) {
-        // 1. Pega o usuário que está logado e fez a requisição (baseado no Token)
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         User loggedInUser = (User) authentication.getPrincipal();
 
-        // 2. Busca o usuário atualizado no banco de dados para garantir
-        // Assumindo que seu repository tem um findById
         User user = repository.findById(loggedInUser.getId()).orElseThrow();
 
-        // 3. Verifica se a senha atual informada bate com a senha criptografada do banco
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (!encoder.matches(data.currentPassword(), user.getPassword())) {
             return ResponseEntity.badRequest().body("Senha atual incorreta.");
         }
 
-        // 4. Criptografa a nova senha e atualiza no banco
         String encryptedNewPassword = encoder.encode(data.newPassword());
-        user.setPassword(encryptedNewPassword); // Atenção: a sua classe User precisa ter o método setPassword()
+        user.setPassword(encryptedNewPassword);
         repository.save(user);
 
         return ResponseEntity.ok("Senha atualizada com sucesso!");
+    }
+
+    // ==========================================
+    // ROTA NOVA: BUSCAR PERFIL DO USUÁRIO
+    // ==========================================
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileDTO> getUserProfile() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        User loggedInUser = (User) authentication.getPrincipal();
+
+        User user = repository.findById(loggedInUser.getId()).orElseThrow();
+
+        // Retornamos tudo, menos a senha e o CPF (para segurança)
+        return ResponseEntity.ok(new UserProfileDTO(user.getFullName(), user.getEmail(), user.getPhone()));
     }
 }

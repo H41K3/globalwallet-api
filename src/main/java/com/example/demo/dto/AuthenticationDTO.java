@@ -1,3 +1,9 @@
 package com.example.demo.dto;
 
-public record AuthenticationDTO(String login, String password) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record AuthenticationDTO(@NotBlank
+        String cpf, @NotBlank
+        String password) {
+
+}
