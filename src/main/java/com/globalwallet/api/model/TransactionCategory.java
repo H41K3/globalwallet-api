@@ -9,5 +9,8 @@ public enum TransactionCategory {
     SALES,
     TRANSPORT,
     OTHER,
-    INVESTMENTS
+    INVESTMENTS,
+    SUBSCRIPTION,
+    TELEPHONY,
+    DRINK
 }

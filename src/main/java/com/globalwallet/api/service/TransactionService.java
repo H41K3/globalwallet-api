@@ -21,7 +21,7 @@ import jakarta.persistence.EntityNotFoundException;
 public class TransactionService {
 
     private final TransactionRepository repository;
-    private final CardRepository cardRepository; // NOVO: Injetando repositório de cartões
+    private final CardRepository cardRepository;
 
     public TransactionService(TransactionRepository repository, CardRepository cardRepository) {
         this.repository = repository;
@@ -52,7 +52,7 @@ public class TransactionService {
         transaction.setType(dto.type());
         transaction.setCategory(dto.category()); 
         
-        // 👇 SALVANDO O NOVO CAMPO: PIX, ACCOUNT ou CARD
+        // SALVANDO O NOVO CAMPO: PIX, ACCOUNT ou CARD
         transaction.setPaymentMethod(dto.paymentMethod()); 
         
         transaction.setUser(user);
@@ -104,7 +104,7 @@ public class TransactionService {
         existingTransaction.setType(dto.type());
         existingTransaction.setCategory(dto.category());
         
-        // 👇 ATUALIZANDO O NOVO CAMPO: PIX, ACCOUNT ou CARD
+        // ATUALIZANDO O NOVO CAMPO: PIX, ACCOUNT ou CARD
         existingTransaction.setPaymentMethod(dto.paymentMethod());
 
         // --- Aplica a nova configuração de cartão ---
@@ -127,16 +127,15 @@ public class TransactionService {
     public BalanceResponseDTO getBalanceSummary(User user) {
         List<Transaction> transactions = repository.findAllByUser(user);
 
-        // --- t.getCard() == null garante que compras no cartão NÃO descontem do Saldo Geral ---
         BigDecimal totalIncome = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.INCOME && t.getCard() == null)
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(t -> t.getAmount() != null ? t.getAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         BigDecimal totalExpense = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE && t.getCard() == null)
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(t -> t.getAmount() != null ? t.getAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         BigDecimal balance = totalIncome.subtract(totalExpense);
 
