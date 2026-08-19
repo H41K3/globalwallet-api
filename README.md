@@ -1,39 +1,41 @@
-# 🌐 GlobalWallet API - Enterprise Finance Backend
+# 🌐 GlobalWallet Web — Dashboard Financeiro
 
-[![Java Version](https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk)](https://openjdk.org/projects/jdk/25/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4-brightgreen?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
-[![Security](https://img.shields.io/badge/Security-JWT_Auth-red?style=for-the-badge&logo=jsonwebtokens)](https://jwt.io/)
-[![Deployment](https://img.shields.io/badge/Live-Render_Cloud-blue?style=for-the-badge&logo=render)](https://globalwallet-api-9ffu.onrender.com/swagger-ui/index.html)
+[![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Axios](https://img.shields.io/badge/axios-671ddf?&style=for-the-badge&logo=axios&logoColor=white)](https://axios-http.com/)
 
-A high-performance RESTful API for financial transaction management. This project demonstrates a production-ready ecosystem with a focus on security, privacy, and cloud-native architecture.
-
-## 🌍 Live Environment
-
-The application is live and integrated with a managed PostgreSQL cluster on Supabase.
-👉 **[Access Live Swagger Documentation](https://globalwallet-api-9ffu.onrender.com/swagger-ui/index.html)**
+🇧🇷 Português | 🇺🇸 English
+🌐 Live: [https://www.globalwallet.app.br](https://www.globalwallet.app.br)
 
 ---
 
-## 🚀 Core Architecture & Technologies
+### 🇧🇷 Sobre o Projeto
 
-* **Language:** Java 25 LTS
-* **Framework:** Spring Boot 3.4
-* **Database:** PostgreSQL (Hosted on Supabase)
-* **Authentication:** Spring Security with Stateless JWT
-* **Connection Pooling:** HikariCP (Optimized for cloud limits)
+Interface web moderna, responsiva e de alta performance para o ecossistema financeiro GlobalWallet. O projeto foi desenvolvido para oferecer uma experiência fluida no gerenciamento de finanças pessoais, controle de orçamento, extratos detalhados e gestão de múltiplos cartões.
+A aplicação consome uma API RESTful de forma segura e dinâmica, refletindo dados em tempo real através de gráficos e dashboards iterativos.
 
-## 🛠️ Local Setup
+### 🛠️ Tecnologias e Recursos
 
-To run this project locally, ensure you have JDK 25 installed and set up the following environment variables:
+O frontend foi arquitetado com foco em componentização, tipagem estática e consumo eficiente de APIs:
+* **React:** Estruturação da interface em componentes funcionais e Hooks.
+* **TypeScript:** Tipagem estática rigorosa, garantindo previsibilidade no consumo dos dados (DTOs).
+* **Vite:** Ferramenta de build de última geração para compilação otimizada e HMR (Hot Module Replacement) ultrarrápido.
+* **Axios:** Cliente HTTP configurado para comunicação assíncrona, tratamento de tokens JWT e chamadas REST.
+* **Recharts:** Renderização de gráficos interativos para análise de despesas.
 
-* `DATABASE_URL` -> Supabase JDBC URL
-* `DATABASE_USER` -> Database username
-* `DATABASE_PASSWORD` -> Database password
-* `JWT_SECRET` -> Your secret key for token generation
-* `PORT` -> 8080
+---
 
-Clone the repository and run:
+### 🇺🇸 About the Project
 
-```bash
-./mvnw spring-boot:run
-```
+A modern, responsive, and high-performance web interface for the GlobalWallet financial ecosystem. Designed to provide a seamless user experience for managing personal finances, tracking budgets, viewing detailed statements, and handling multiple credit/debit cards.
+The application securely consumes a RESTful API, displaying real-time data through interactive charts and dynamic dashboards.
+
+### 🛠️ Technologies & Features
+
+The frontend is built with a strong focus on clean architecture, componentization, and efficient API consumption:
+* **React:** UI built with functional components and modern Hooks.
+* **TypeScript:** Strict static typing for robust state management and predictable API data handling (DTOs).
+* **Vite:** Next-generation frontend tooling for a lightning-fast development environment and optimized production builds.
+* **Axios:** Configured HTTP client for async requests, JWT token management, and REST API communication.
+* **Recharts:** Interactive charting library for visual expense tracking.

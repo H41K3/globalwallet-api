@@ -17,6 +17,12 @@ public record CardRequestDTO(
         Double totalLimit,
 
         @NotBlank(message = "A cor do cartão é obrigatória")
-        String color
+        String color,
+
+        // --- NOVOS CAMPOS ADICIONADOS AQUI ---
+        String flag,
+        String type,
+        Integer closingDate,
+        Integer dueDate
 ) {
 }

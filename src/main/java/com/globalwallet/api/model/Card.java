@@ -34,23 +34,37 @@ public class Card {
     private User user;
 
     private String name;           // Ex: Nubank
-    
+
     @Column(name = "last_digits")
     private String lastDigits;     // Ex: 4321
-    
+
     private Double totalLimit;     // Limite total do cartão (Ex: 5000.0)
-    
+
     private Double currentInvoice; // Fatura atual (começa em 0.0)
-    
+
     private String color;          // Cor em Hex (Ex: #8A05BE)
 
+    private String flag;           // Ex: MASTERCARD, VISA, SODEXO
+
+    private String type;           // Ex: CREDIT, DEBIT, VR, VA
+
+    @Column(name = "closing_date")
+    private Integer closingDate;   // Dia de fechamento da fatura
+
+    @Column(name = "due_date")
+    private Integer dueDate;       // Dia de vencimento da fatura
+
     // Construtor para facilitar a criação a partir do DTO
-    public Card(User user, String name, String lastDigits, Double totalLimit, String color) {
+    public Card(User user, String name, String lastDigits, Double totalLimit, String color, String flag, String type, Integer closingDate, Integer dueDate) {
         this.user = user;
         this.name = name;
         this.lastDigits = lastDigits;
         this.totalLimit = totalLimit;
         this.currentInvoice = 0.0; // Todo cartão nasce com fatura zerada
         this.color = color;
+        this.flag = flag;
+        this.type = type;
+        this.closingDate = closingDate;
+        this.dueDate = dueDate;
     }
 }

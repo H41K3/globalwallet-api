@@ -31,12 +31,17 @@ public class CardService {
 
     @Transactional
     public Card createCard(CardRequestDTO dto, User user) {
+        // Agora o construtor tem todos os 9 parâmetros que a entidade exige
         Card card = new Card(
             user,
             dto.name(),
             dto.lastDigits(),
             dto.totalLimit(),
-            dto.color()
+            dto.color(),
+            dto.flag(),
+            dto.type(),
+            dto.closingDate(),
+            dto.dueDate()
         );
         return repository.save(card);
     }
@@ -49,6 +54,12 @@ public class CardService {
         card.setLastDigits(dto.lastDigits());
         card.setTotalLimit(dto.totalLimit());
         card.setColor(dto.color());
+        
+        // Atualizando os novos campos na edição
+        card.setFlag(dto.flag());
+        card.setType(dto.type());
+        card.setClosingDate(dto.closingDate());
+        card.setDueDate(dto.dueDate());
         
         return repository.save(card);
     }
